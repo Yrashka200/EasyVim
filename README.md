@@ -1,2 +1,2 @@
-# LazyVim-
-My own file confugirations for LazyVim
+# EasyVim
+My own file confugirations for Neovim - EasyVim
