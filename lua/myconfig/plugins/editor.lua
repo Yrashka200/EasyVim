@@ -1,4 +1,57 @@
 return {
+  -- Автосохранение изменённых файлов
+  {
+    "okuuva/auto-save.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {
+      debounce_delay = 1000,
+      condition = function(buf)
+        local excluded_filetypes = {
+          "gitcommit",
+          "neo-tree",
+          "TelescopePrompt",
+          "toggleterm",
+        }
+
+        return vim.bo[buf].buftype == "" and not vim.tbl_contains(excluded_filetypes, vim.bo[buf].filetype)
+      end,
+    },
+  },
+
+  -- GitHub Copilot: ИИ-подсказки кода
+  {
+    "github/copilot.vim",
+    init = function()
+      vim.g.copilot_no_tab_map = true
+    end,
+    config = function()
+      vim.keymap.set("i", "<C-J>", function()
+        return vim.fn["copilot#Accept"]("\r")
+      end, { expr = true, replace_keycodes = false, desc = "Accept Copilot suggestion" })
+      vim.keymap.set("n", "<leader>ap", "<cmd>Copilot panel<cr>", { desc = "Open Copilot panel" })
+    end,
+  },
+  {
+    "CopilotC-Nvim/CopilotChat.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {},
+    cmd = {
+      "CopilotChat",
+      "CopilotChatOpen",
+      "CopilotChatClose",
+      "CopilotChatToggle",
+      "CopilotChatStop",
+      "CopilotChatReset",
+      "CopilotChatSave",
+      "CopilotChatLoad",
+      "CopilotChatPrompts",
+      "CopilotChatModels",
+    },
+    keys = {
+      { "<leader>ac", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
+    },
+  },
+
   -- Дерево файлов
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -106,4 +159,27 @@ return {
       })
     end,
   },
-}
+
+  -- Предпросмотр Markdown в браузере
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = "markdown",
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_auto_start = 0
+      vim.g.mkdp_auto_close = 1
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "markdown",
+        callback = function(event)
+          vim.keymap.set("n", "f", "<cmd>MarkdownPreviewToggle<CR>", {
+            buffer = event.buf,
+            desc = "Toggle Markdown browser preview",
+          })
+        end,
+      })
+    end,
+  },
+} 

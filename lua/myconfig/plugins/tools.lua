@@ -29,6 +29,8 @@ return {
       -- В режиме терминала: Esc возвращает в нормальный режим, Ctrl+/ закрывает
       vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Выйти в нормальный режим" })
       vim.keymap.set("t", "<C-_>", [[<C-\><C-n>:ToggleTerm<CR>]], { desc = "Закрыть терминал" })
+
+      require("myconfig.music").setup()
     end,
   },
   -- Автозакрытие скобок и кавычек
