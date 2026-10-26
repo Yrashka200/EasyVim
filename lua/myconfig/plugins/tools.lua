@@ -1,20 +1,20 @@
 return {
-  -- Значки изменений Git на полях
+  -- Git change indicators in the sign column
   {
     "lewis6991/gitsigns.nvim",
     config = function()
       require("gitsigns").setup()
     end,
   },
-  -- Удобный терминал внутри Neovim
+  -- Floating terminal inside Neovim
   {
     "akinsho/toggleterm.nvim",
     version = "*",
     config = function()
       require("toggleterm").setup({
         size = 20,
-        open_mapping = [[<c-\>]], -- Родная комбинация Ctrl + \ (обратный слэш)
-        direction = "float",      -- Открывать в плавающем окне по центру
+        open_mapping = [[<c-\>]], -- Ctrl + \
+        direction = "float",      -- Open in a centered floating window
         shade_terminals = true,
         float_opts = {
           border = "curved",
@@ -22,18 +22,18 @@ return {
         },
       })
 
-      -- Дополнительные удобные бинды
-      -- Ctrl + / (часто передается как Ctrl + _)
-      vim.keymap.set("n", "<C-_>", ":ToggleTerm<CR>", { desc = "Открыть терминал" })
+      -- Additional keymaps
+      -- Ctrl + / is often represented as Ctrl + _
+      vim.keymap.set("n", "<C-_>", ":ToggleTerm<CR>", { desc = "Open terminal" })
       
-      -- В режиме терминала: Esc возвращает в нормальный режим, Ctrl+/ закрывает
-      vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Выйти в нормальный режим" })
-      vim.keymap.set("t", "<C-_>", [[<C-\><C-n>:ToggleTerm<CR>]], { desc = "Закрыть терминал" })
+      -- In terminal mode, Esc returns to normal mode and Ctrl + / closes the terminal
+      vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Return to normal mode" })
+      vim.keymap.set("t", "<C-_>", [[<C-\><C-n>:ToggleTerm<CR>]], { desc = "Close terminal" })
 
       require("myconfig.music").setup()
     end,
   },
-  -- Автозакрытие скобок и кавычек
+  -- Automatically pair brackets and quotes
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",

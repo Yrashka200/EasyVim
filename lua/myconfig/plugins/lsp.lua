@@ -1,5 +1,5 @@
 return {
-  -- Установка серверов
+  -- Language server installation
   {
     "williamboman/mason.nvim",
     build = ":MasonUpdate",
@@ -12,19 +12,19 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "pyright", "ts_ls" }, -- Твои языки
+        ensure_installed = { "lua_ls", "pyright", "ts_ls" }, -- Configured languages
         automatic_installation = true,
       })
     end,
   },
-  -- Настройка LSP (НОВЫЙ СПОСОБ ДЛЯ NEOVIM 0.11+)
+  -- LSP configuration (Neovim 0.11+ API)
   {
     "neovim/nvim-lspconfig",
     dependencies = { "hrsh7th/cmp-nvim-lsp", "williamboman/mason-lspconfig.nvim" },
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-      -- Настраиваем серверы через новый API Neovim
+      -- Configure servers with the Neovim 0.11+ API
       vim.lsp.config("lua_ls", {
         capabilities = capabilities,
         settings = { Lua = { diagnostics = { globals = { "vim" } } } },
@@ -32,10 +32,10 @@ return {
       vim.lsp.config("pyright", { capabilities = capabilities })
       vim.lsp.config("ts_ls", { capabilities = capabilities })
 
-      -- Включаем их
+      -- Enable the configured servers
       vim.lsp.enable({ "lua_ls", "pyright", "ts_ls" })
 
-      -- Клавиши при подключении LSP
+      -- Set keymaps when an LSP client attaches
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local opts = { buffer = args.buf }
@@ -47,7 +47,7 @@ return {
       })
     end,
   },
-  -- Менюшка автодополнения
+  -- Completion menu
   {
     "hrsh7th/nvim-cmp",
     dependencies = {

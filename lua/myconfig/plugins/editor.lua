@@ -1,5 +1,5 @@
 return {
-  -- Автосохранение изменённых файлов
+  -- Automatically save changed files
   {
     "okuuva/auto-save.nvim",
     event = { "BufReadPost", "BufNewFile" },
@@ -18,7 +18,7 @@ return {
     },
   },
 
-  -- GitHub Copilot: ИИ-подсказки кода
+  -- GitHub Copilot code suggestions
   {
     "github/copilot.vim",
     init = function()
@@ -52,7 +52,7 @@ return {
     },
   },
 
-  -- Дерево файлов
+  -- File explorer
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -63,13 +63,13 @@ return {
     end,
   },
 
-  -- Поиск (Telescope)
+  -- Search (Telescope)
   {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
-      -- ФИКС: Отключаем багованную подсветку Treesitter в предпросмотре
+      -- Disable Treesitter highlighting in the preview
       require("telescope").setup({
         defaults = {
           preview = {
@@ -85,13 +85,13 @@ return {
       local actions = require("telescope.actions")
       local action_state = require("telescope.actions.state")
 
-      -- Основные горячие клавиши
+      -- Main keymaps
       vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find File" })
       vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Find Text" })
       vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Buffers" })
       vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Help" })
 
-      -- Функция для создания "шторок" (ИСПРАВЛЕНО: title вместо prompt_title)
+      -- Create a custom picker menu
       local function custom_menu(title, items)
         local opts = { title = " " .. title .. " " }
         pickers.new(opts, {
@@ -117,7 +117,7 @@ return {
         }):find()
       end
 
-      -- ШТОРКА: Files
+      -- Files menu
       vim.keymap.set("n", "<leader>fm", function()
         custom_menu("Files Menu", {
           { name = "  Find File", cmd = "Telescope find_files" },
@@ -128,7 +128,7 @@ return {
         })
       end, { desc = "Files Menu" })
 
-      -- ШТОРКА: Config
+      -- Config menu
       vim.keymap.set("n", "<leader>cm", function()
         local config_path = vim.fn.stdpath("config")
         custom_menu("Config Menu", {
@@ -139,18 +139,18 @@ return {
     end,
   },
 
-  -- Подсветка синтаксиса (Treesitter)
+  -- Syntax highlighting (Treesitter)
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      -- Установка парсеров (новый API)
+      -- Install parsers with the new API
       require("nvim-treesitter").setup({
         ensure_installed = { "lua", "vim", "vimdoc", "query", "python", "javascript", "typescript", "html", "css", "json" },
         auto_install = true,
       })
 
-      -- Включение подсветки и отступов
+      -- Enable highlighting and indentation
       vim.api.nvim_create_autocmd("FileType", {
         callback = function()
           pcall(vim.treesitter.start)
@@ -160,7 +160,7 @@ return {
     end,
   },
 
-  -- Предпросмотр Markdown в браузере
+  -- Markdown preview in the browser
   {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },

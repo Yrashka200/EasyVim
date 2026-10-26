@@ -1,5 +1,5 @@
 return {
-  -- Коллекция популярных тем
+  -- Popular colorschemes
   {
     "folke/tokyonight.nvim",
     lazy = false,
@@ -39,7 +39,7 @@ return {
   
   { "nvim-tree/nvim-web-devicons", lazy = true },
 
-  -- СТАРТОВОЕ МЕНЮ (Как на твоем втором фото)
+  -- Startup dashboard
   {
     "goolord/alpha-nvim",
     event = "VimEnter",
@@ -62,7 +62,7 @@ return {
         return dashboard.button(shortcut, "  " .. text, action)
       end
 
-      -- ГЛАВНОЕ МЕНЮ (4 кнопки)
+      -- Main menu buttons
       dashboard.section.buttons.val = {
         btn("f", "Files               (Open Menu)", "<leader>fm"),
         btn("c", "Config              (Open Menu)", "<leader>cm"),
@@ -90,7 +90,7 @@ return {
     end,
   },
 
-  -- Статус-лайн
+  -- Status line
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -105,7 +105,7 @@ return {
     end,
   },
 
-  -- Вкладки сверху
+  -- Buffer tabs
   {
     "akinsho/bufferline.nvim",
     version = "*",
