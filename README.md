@@ -7,6 +7,7 @@ The setup is organized into separate Lua modules for editor options, keymaps, an
 ## Features
 
 - **Dashboard and navigation:** A startup dashboard, file explorer, buffer tabs, and Telescope pickers for files, recent files, open buffers, help, and text search.
+- **Coding time:** An English dashboard side panel tracks active editor time by programming language, with daily and all-time totals. Open it at any time with `:CodingStats` or `<leader>cs`. Only focused Neovim time in recognized code buffers is counted; statistics are saved under Neovim's state directory.
 - **Coding tools:** Treesitter syntax highlighting and indentation, LSP support, and completion for Lua, Python, and TypeScript/JavaScript.
 - **Plugin-managed language servers:** Mason is configured for `lua_ls`, `pyright`, and `ts_ls`.
 - **Git and terminal:** Git change markers in the sign column and a floating terminal inside Neovim.

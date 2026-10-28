@@ -47,6 +47,7 @@ return {
     config = function()
       local alpha = require("alpha")
       local dashboard = require("alpha.themes.dashboard")
+      require("myconfig.coding_stats").setup()
 
       dashboard.section.header.val = {
         "    ███████╗ █████╗ ███████╗██╗   ██╗██╗   ██╗██╗███╗   ███╗",
