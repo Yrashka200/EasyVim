@@ -3,12 +3,14 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)"
+GITHUB_REPOSITORY="https://github.com/Yrashka200/EasyVim.git"
 TOTAL_STEPS=5
 COMPLETED_STEPS=0
 START_TIME="$(date +%s)"
 PLATFORM=""
 PACKAGE_MANAGER=""
 CONFIG_DIR=""
+DOWNLOAD_DIR=""
 
 usage() {
   cat <<'EOF'
@@ -63,6 +65,32 @@ complete_step() {
   COMPLETED_STEPS=$((COMPLETED_STEPS + 1))
   report_progress "$1"
 }
+
+run_with_progress() {
+  local title="$1"
+  shift
+  "$@" &
+  local process_id=$!
+  while kill -0 "$process_id" 2>/dev/null; do
+    sleep 5
+    if kill -0 "$process_id" 2>/dev/null; then
+      report_progress "$title"
+    fi
+  done
+  wait "$process_id"
+}
+
+cleanup_download() {
+  if [[ -n "$DOWNLOAD_DIR" && -d "$DOWNLOAD_DIR" ]]; then
+    rm -rf -- "$DOWNLOAD_DIR"
+  fi
+}
+
+directory_has_entries() (
+  shopt -s nullglob dotglob
+  local entries=("$1"/*)
+  (( ${#entries[@]} > 0 ))
+)
 
 fail() {
   echo "Error: $*" >&2
@@ -294,11 +322,22 @@ fi
 report_progress "Starting EasyVim installation"
 detect_platform
 config_path
+
+if [[ -d "$CONFIG_DIR" ]] && directory_has_entries "$CONFIG_DIR"; then
+  CONFIG_DIR="$(cd "$CONFIG_DIR" && pwd -P)"
+  TOTAL_STEPS=2
+  complete_step "Detected $PLATFORM and existing Neovim configuration"
+  echo "Neovim configuration already exists at: $CONFIG_DIR"
+  echo "Leaving it unchanged. No update was downloaded or installed."
+  complete_step "No configuration files changed"
+  exit 0
+fi
+
 missing=()
 while IFS= read -r tool; do
   [[ -n "$tool" ]] && missing+=("$tool")
 done < <(missing_requirements)
-complete_step "Detected $PLATFORM; checked system requirements"
+complete_step "Detected $PLATFORM; no existing configuration found"
 
 if ! command -v rg >/dev/null 2>&1; then
   echo "Optional: ripgrep is not installed. Telescope live text search (Space f g) will be unavailable."
@@ -316,15 +355,7 @@ if (( ${#missing[@]} > 0 )); then
   fi
   case "$answer" in
     y|Y|yes|YES)
-      install_requirements "${missing[@]}" &
-      install_pid=$!
-      while kill -0 "$install_pid" 2>/dev/null; do
-        sleep 5
-        if kill -0 "$install_pid" 2>/dev/null; then
-          report_progress "Installing system requirements"
-        fi
-      done
-      if ! wait "$install_pid"; then
+      if ! run_with_progress "Installing system requirements" install_requirements "${missing[@]}"; then
         fail "Dependency installation failed."
       fi
       ;;
@@ -342,30 +373,8 @@ if (( ${#missing[@]} > 0 )); then
 fi
 complete_step "System requirements are ready"
 
-CONFIG_PRESENT=0
-if [[ -d "$CONFIG_DIR" ]] && [[ -n "$(find "$CONFIG_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]]; then
-  CONFIG_PRESENT=1
-fi
-
 mkdir -p "$CONFIG_DIR"
 CONFIG_DIR="$(cd "$CONFIG_DIR" && pwd -P)"
-
-if [[ "$SCRIPT_DIR" == "$CONFIG_DIR" ]]; then
-  complete_step "Configuration is already installed"
-  complete_step "No backup needed"
-  complete_step "Installation verified"
-  echo "Neovim configuration already exists at: $CONFIG_DIR"
-  echo "EasyVim is already installed at this path."
-  exit 0
-fi
-
-if [[ "$CONFIG_PRESENT" -eq 1 ]]; then
-  echo "Neovim configuration already exists at: $CONFIG_DIR"
-  echo "It will be backed up before EasyVim is installed."
-else
-  echo "No Neovim configuration was found at: $CONFIG_DIR"
-  echo "Installing EasyVim there now."
-fi
 
 case "$SCRIPT_DIR/" in
   "$CONFIG_DIR/"*)
@@ -377,23 +386,23 @@ case "$CONFIG_DIR/" in
     fail "The Neovim config directory is inside the project directory."
     ;;
 esac
-complete_step "Prepared configuration directory"
+complete_step "Prepared empty configuration directory"
 
-if [[ "$CONFIG_PRESENT" -eq 1 ]]; then
-  BACKUP_DIR="${CONFIG_DIR}.backup-$(date +%Y%m%d-%H%M%S)"
-  if [[ -e "$BACKUP_DIR" ]]; then
-    BACKUP_DIR="${BACKUP_DIR}-$$"
-  fi
-  cp -R "$CONFIG_DIR" "$BACKUP_DIR"
-  echo "Existing configuration backed up to: $BACKUP_DIR"
-else
-  echo "No existing configuration files needed a backup."
-fi
-complete_step "Backed up existing configuration (if present)"
+DOWNLOAD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/easyvim-install.XXXXXX")"
+trap cleanup_download EXIT
+run_with_progress "Downloading the latest EasyVim from GitHub" \
+  git clone --depth 1 --quiet "$GITHUB_REPOSITORY" "$DOWNLOAD_DIR/repository" ||
+  fail "Could not download the latest version from GitHub."
+mkdir -p "$DOWNLOAD_DIR/source"
+git -C "$DOWNLOAD_DIR/repository" archive --format=tar HEAD |
+  tar -xf - -C "$DOWNLOAD_DIR/source"
+[[ -f "$DOWNLOAD_DIR/source/init.lua" ]] ||
+  fail "The GitHub repository does not contain init.lua at its root."
+complete_step "Downloaded and verified the latest GitHub version"
 
-cp -R "$SCRIPT_DIR"/. "$CONFIG_DIR"/
+cp -R "$DOWNLOAD_DIR/source"/. "$CONFIG_DIR"/
 [[ -f "$CONFIG_DIR/init.lua" ]] || fail "Installation verification failed: init.lua is missing."
-complete_step "Copied and verified EasyVim configuration"
+complete_step "Installed and verified EasyVim configuration"
 echo "EasyVim configuration installed to: $CONFIG_DIR"
 echo "Start Neovim; plugins and language servers are installed on first launch."
 
