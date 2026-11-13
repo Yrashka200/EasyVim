@@ -6,10 +6,10 @@ function M.setup()
   end
 
   vim.api.nvim_create_user_command("SpotifyWeb", open_spotify_web, {
-    desc = "Открыть Spotify Web в браузере",
+    desc = "Open Spotify Web in browser",
   })
   vim.keymap.set("n", "<leader>mp", open_spotify_web, {
-    desc = "Открыть Spotify Web",
+    desc = "Open Spotify Web",
   })
 end
 
