@@ -2,47 +2,41 @@ return {
   -- Popular colorschemes
   {
     "folke/tokyonight.nvim",
-    lazy = false,
-    priority = 1000,
     opts = { style = "night" },
+    config = function(_, opts)
+      require("tokyonight").setup(opts)
+      vim.cmd.colorscheme("tokyonight-night")
+    end,
   },
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    lazy = false,
-    priority = 999,
   },
   {
     "projekt0n/github-nvim-theme",
     name = "github-theme",
-    lazy = false,
-    priority = 998,
   },
   {
     "Mofiqul/vscode.nvim",
-    lazy = false,
-    priority = 997,
   },
   {
     "navarasu/onedark.nvim",
-    lazy = false,
-    priority = 996,
   },
   {
     "rebelot/kanagawa.nvim",
-    lazy = false,
-    priority = 995,
-    config = function()
-      vim.cmd([[colorscheme tokyonight-night]])
-    end,
   },
-  
-  { "nvim-tree/nvim-web-devicons", lazy = true },
+  { "ellisonleao/gruvbox.nvim" },
+  { "shaunsingh/nord.nvim" },
+  { "sainnhe/everforest" },
+  { "rose-pine/neovim", name = "rose-pine" },
+  { "Mofiqul/dracula.nvim" },
+  { "EdenEast/nightfox.nvim" },
+
+  { "nvim-tree/nvim-web-devicons" },
 
   -- Startup dashboard
   {
     "goolord/alpha-nvim",
-    event = "VimEnter",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
       local alpha = require("alpha")
@@ -67,14 +61,14 @@ return {
       dashboard.section.buttons.val = {
         btn("f", "Files               (Open Menu)", "<leader>fm"),
         btn("c", "Config              (Open Menu)", "<leader>cm"),
-        btn("l", "Plugin Manager      (App)", ":Lazy<CR>"),
+        btn("p", "Plugins             (Install / manage / help)", ":PluginManager<CR>"),
         btn("q", "Quit Neovim         (App)", ":qa<CR>"),
       }
 
       dashboard.section.footer.val = function()
-        local stats = require("lazy").stats()
-        local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-        return " EasyVim | Loaded " .. stats.loaded .. " plugins in " .. ms .. "ms"
+        local stats = require("myconfig.plugin_manager").stats()
+        local ms = math.floor(stats.startuptime + 0.5)
+        return " EasyVim | " .. stats.installed .. "/" .. stats.total .. " plugins | " .. ms .. "ms"
       end
 
       dashboard.opts.layout = {
@@ -109,7 +103,6 @@ return {
   -- Buffer tabs
   {
     "akinsho/bufferline.nvim",
-    version = "*",
     dependencies = "nvim-tree/nvim-web-devicons",
     config = function()
       require("bufferline").setup({

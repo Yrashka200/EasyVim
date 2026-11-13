@@ -2,7 +2,6 @@ return {
   -- Automatically save changed files
   {
     "okuuva/auto-save.nvim",
-    event = { "BufReadPost", "BufNewFile" },
     opts = {
       debounce_delay = 1000,
       condition = function(buf)
@@ -34,19 +33,8 @@ return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
+    main = "CopilotChat",
     opts = {},
-    cmd = {
-      "CopilotChat",
-      "CopilotChatOpen",
-      "CopilotChatClose",
-      "CopilotChatToggle",
-      "CopilotChatStop",
-      "CopilotChatReset",
-      "CopilotChatSave",
-      "CopilotChatLoad",
-      "CopilotChatPrompts",
-      "CopilotChatModels",
-    },
     keys = {
       { "<leader>ac", "<cmd>CopilotChatToggle<cr>", desc = "Toggle Copilot Chat" },
     },
@@ -133,7 +121,7 @@ return {
         local config_path = vim.fn.stdpath("config")
         custom_menu("Config Menu", {
           { name = "  Edit Config Files", cmd = "Telescope find_files cwd=" .. config_path },
-          { name = "  Plugin Manager", cmd = "Lazy" },
+          { name = "  Plugin Manager", cmd = "PluginManager" },
         })
       end, { desc = "Config Menu" })
     end,
@@ -142,7 +130,6 @@ return {
   -- Syntax highlighting (Treesitter)
   {
     "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
     config = function()
       -- Install parsers with the new API
       require("nvim-treesitter").setup({
@@ -163,9 +150,8 @@ return {
   -- Markdown preview in the browser
   {
     "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = "markdown",
-    build = "cd app && npm install",
+    build = { "npm", "install" },
+    build_cwd = "app",
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
       vim.g.mkdp_auto_start = 0

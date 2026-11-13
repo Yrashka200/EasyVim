@@ -9,7 +9,6 @@ return {
   -- Floating terminal inside Neovim
   {
     "akinsho/toggleterm.nvim",
-    version = "*",
     config = function()
       require("toggleterm").setup({
         size = 20,
@@ -36,7 +35,6 @@ return {
   -- Automatically pair brackets and quotes
   {
     "windwp/nvim-autopairs",
-    event = "InsertEnter",
     config = function()
       require("nvim-autopairs").setup({})
     end,

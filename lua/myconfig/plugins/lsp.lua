@@ -2,7 +2,6 @@ return {
   -- Language server installation
   {
     "williamboman/mason.nvim",
-    build = ":MasonUpdate",
     config = function()
       require("mason").setup()
     end,
@@ -12,7 +11,7 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "pyright", "ts_ls" }, -- Configured languages
+        ensure_installed = { "lua_ls", "pyright", "ts_ls", "html", "emmet_ls" },
         automatic_installation = true,
       })
     end,
@@ -31,9 +30,14 @@ return {
       })
       vim.lsp.config("pyright", { capabilities = capabilities })
       vim.lsp.config("ts_ls", { capabilities = capabilities })
+      vim.lsp.config("html", { capabilities = capabilities })
+      vim.lsp.config("emmet_ls", {
+        capabilities = capabilities,
+        filetypes = { "html", "css", "scss", "javascriptreact", "typescriptreact", "vue", "svelte" },
+      })
 
       -- Enable the configured servers
-      vim.lsp.enable({ "lua_ls", "pyright", "ts_ls" })
+      vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "html", "emmet_ls" })
 
       -- Set keymaps when an LSP client attaches
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -59,6 +63,8 @@ return {
     },
     config = function()
       local cmp = require("cmp")
+      require("luasnip").add_snippets("html", require("myconfig.snippets.html"))
+
       cmp.setup({
         snippet = {
           expand = function(args) require("luasnip").lsp_expand(args.body) end,
